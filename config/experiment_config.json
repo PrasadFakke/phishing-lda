@@ -1,0 +1,11 @@
+{
+  "dataset_path": "data/phishing.csv",
+  "target_column": "class",
+  "positive_label": -1,
+  "identifier_columns": ["Index"],
+  "test_size": 0.2,
+  "random_state": 42,
+  "cv_folds": 5,
+  "primary_solver": "lsqr",
+  "primary_shrinkage": "auto"
+}

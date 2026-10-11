@@ -1,0 +1,11 @@
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+models/*.joblib
+outputs/*.json
+outputs/*.csv
+app/static/plots/*.png
+!app/static/plots/.gitkeep
+data/*.csv
+!data/README.md

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Bharatiya Vidya Bhavan’s Sardar Patel Institute of Technology</p>
+  <h1>Linear Discriminant Analysis for phishing detection</h1>
+  <p>A focused study of an interpretable classifier for distinguishing phishing websites from legitimate ones using structured web indicators.</p>
+  <a class="button" href="/evaluation">Explore the experiment <span aria-hidden="true">→</span></a>
+  <div class="hero-meta"><span class="dot" aria-hidden="true"></span><span>Local research demonstration</span><span>·</span><span>Group 4</span></div>
+</section>
+
+<section class="section" aria-labelledby="project-overview">
+  <div class="section-heading"><div><h2 id="project-overview">Project overview</h2><p>From benchmark data to a transparent classification result.</p></div><span class="tag blue">Assigned algorithm · LDA</span></div>
+  <div class="grid grid-3">
+    <article class="card"><div class="card-icon" aria-hidden="true">01</div><h3>Identify suspicious sites</h3><p>Use observed URL, domain, page behavior, and reputation indicators to classify a website.</p></article>
+    <article class="card"><div class="card-icon" aria-hidden="true">02</div><h3>Measure the tradeoffs</h3><p>Review phishing misses and false alarms alongside precision, recall, and other held-out metrics.</p></article>
+    <article class="card"><div class="card-icon" aria-hidden="true">03</div><h3>Explain the decision</h3><p>Relate the model to Fisher’s discriminant objective and its shared-covariance assumptions.</p></article>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="dataset-summary">
+  <div class="section-heading"><div><h2 id="dataset-summary">Study snapshot</h2><p>Verified values from the dataset audit.</p></div><a class="button-secondary" href="/dataset">Explore dataset</a></div>
+  <div class="metric-grid">
+    <div class="metric"><span class="metric-label">Website records</span><span class="metric-value">11,054</span><span class="metric-note">Rows in the supplied CSV</span></div>
+    <div class="metric teal"><span class="metric-label">Phishing examples</span><span class="metric-value">4,897</span><span class="metric-note">Label −1 · positive class</span></div>
+    <div class="metric"><span class="metric-label">Legitimate examples</span><span class="metric-value">6,157</span><span class="metric-note">Label +1</span></div>
+    <div class="metric"><span class="metric-label">Predictor features</span><span class="metric-value">30</span><span class="metric-note">Sequential index excluded</span></div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="status-heading">
+  <div class="section-heading"><div><h2 id="status-heading">Experiment status</h2><p>The interface reflects the artifacts currently available in this workspace.</p></div></div>
+  {% if model_ready %}<div class="status-panel success"><span class="status-icon" aria-hidden="true">✓</span><div><strong>Model and evaluation artifacts are ready</strong><p>Open Evaluation to review the saved held-out results or Demo to classify a dataset record.</p></div></div>{% else %}<div class="status-panel"><span class="status-icon" aria-hidden="true">!</span><div><strong>Training artifacts are not available yet</strong><p>Run <code>python -m src.train</code> in an environment where scikit-learn loads successfully to generate the model, evaluation metrics, and plots.</p></div></div>{% endif %}
+</section>
+{% endblock %}

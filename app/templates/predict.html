@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-heading"><p class="eyebrow">Interactive model demo</p><h1>Try a dataset example</h1><p>Choose a verified row, inspect the feature values, and submit them to the saved model pipeline.</p></div>
+<div class="grid grid-2">
+  <section class="card"><div class="section-heading"><div><h2>Choose a sample</h2><p>Rows are drawn from the supplied dataset.</p></div><span class="tag blue">First 50 rows</span></div><div class="select-group"><div class="field"><label for="row">Dataset row</label><select id="row">{% for item in rows %}<option value="{{ item.id }}">Record {{ item.id }}</option>{% endfor %}</select></div><button id="predict" type="button">Classify record <span aria-hidden="true">→</span></button></div><p class="footnote" style="margin:12px 0 0">The model uses all 30 verified predictors in their original feature order.</p></section>
+  <section class="card"><div class="section-heading"><div><h2>Prediction</h2><p>Probability estimates are not certainty.</p></div></div><div id="prediction" class="result-box" role="status" aria-live="polite">Select a record and run the saved model.</div></section>
+</div>
+<section class="section"><div class="section-heading"><div><h2>Feature values</h2><p id="feature-caption">Loading selected record…</p></div></div><pre id="features" aria-live="polite">Loading…</pre></section>
+<div class="status-panel"><span class="status-icon" aria-hidden="true">i</span><div><strong>Dataset demonstration</strong><p>This tool predicts from pre-extracted indicators. It does not visit a website or inspect a raw URL. Predicted probabilities are model estimates.</p></div></div>
+{% endblock %}

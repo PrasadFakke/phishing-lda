@@ -1,6 +1,6 @@
 # LDA phishing website classification
 
-Research implementation of scikit-learn Linear Discriminant Analysis (LDA) with a FastAPI localhost demonstration. The verified source file in this workspace is `data/phishing.csv` (do not commit the data file).
+Research implementation of scikit-learn Linear Discriminant Analysis (LDA) with a FastAPI localhost demonstration. The verified source file in this workspace is `data/phishing.csv`.
 
 ## Windows PowerShell
 

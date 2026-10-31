@@ -16,7 +16,7 @@ uvicorn app.main:app --reload
 
 Open http://127.0.0.1:8000. Install a supported Python/scikit-learn wheel if Windows blocks compiled package extensions. Training writes the model to `models/lda_pipeline.joblib`, results and comparison tables to `outputs/`, and plots to `app/static/plots/`. Evaluation numbers are never hardcoded into the app.
 
-If dataset file is missing, download the Kaggle Phishing Website Detector CSV and place it at `data/phishing.csv`. The included dataset is structured feature data, not raw URLs. Label `-1` is phishing and `+1` is legitimate. `Index` is a unique sequential identifier and is excluded from predictors. Train/test splitting is stratified 80/20, seed 42; preprocessing is fitted within each training fold/pipeline. Configurations are chosen using 5-fold training-only F1, then evaluated once on the held-out test partition.
+If dataset file is missing, download the Kaggle Phishing Website Detector CSV and place it at `data/phishing.csv`. The included dataset is structured feature data, not raw URLs. Label `-1` is phishing and `+1` is legitimate. `Index` is a unique sequential identifier and is excluded from predictors. A stratified grouped 5-fold split (seed 42) holds identical predictor vectors together to prevent duplicate-vector leakage; the first fold is the approximately 80/20 test split. Preprocessing is fitted inside each training fold/pipeline. Configurations are chosen using grouped 5-fold training-only F1, then evaluated once on the held-out test partition.
 
 ## Project map
 

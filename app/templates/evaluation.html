@@ -5,6 +5,7 @@
 <section class="empty-state"><div class="card-icon" style="margin:0 auto 14px">···</div><h2>Experiment results are not available yet</h2><p>Train and evaluate the model to populate this page with measured results.</p><code>python -m src.train</code></section>
 {% else %}
 <div class="label-row"><span class="tag blue">Test records · {{ results.dataset.test_samples }}</span><span class="tag green">Positive class · {{ results.positive_class }}</span><span class="tag">Selected · {{ results.selection.selected }}</span></div>
+{% if results.split %}<p class="chart-caption">Evaluation uses a stratified grouped split (seed {{ results.split.random_state }}). Identical predictor vectors stay in one fold, so these results are not directly comparable with the earlier row-wise random split.</p>{% endif %}
 <div class="metric-grid">
   <div class="metric"><span class="metric-label">Accuracy</span><span class="metric-value">{{ '%.3f'|format(results.metrics.accuracy) }}</span><span class="metric-note">All test records</span></div>
   <div class="metric teal"><span class="metric-label">Phishing recall</span><span class="metric-value">{{ '%.3f'|format(results.metrics.recall) }}</span><span class="metric-note">Phishing detected</span></div>

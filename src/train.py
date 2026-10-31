@@ -5,7 +5,7 @@ import pandas as pd
 import sklearn
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
+from sklearn.model_selection import StratifiedGroupKFold, cross_val_score
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score, confusion_matrix,
     roc_auc_score, average_precision_score, roc_curve, precision_recall_curve)
 import matplotlib
@@ -16,13 +16,21 @@ from src.preprocessing import make_preprocessor, prepare_xy
 
 def main():
     cfg=load_config(); df=load_dataset(); X,y=prepare_xy(df,cfg)
-    Xtr,Xte,ytr,yte=train_test_split(X,y,test_size=cfg["test_size"],random_state=cfg["random_state"],stratify=y)
+    # Identical feature vectors (including any conflicting-label cases) stay
+    # together, preventing repeated records from crossing evaluation folds.
+    groups=pd.factorize(pd.MultiIndex.from_frame(X),sort=True)[0]
+    split=StratifiedGroupKFold(n_splits=cfg["cv_folds"],shuffle=True,random_state=cfg["random_state"])
+    train_idx,test_idx=next(split.split(X,y,groups=groups))
+    Xtr,Xte=X.iloc[train_idx],X.iloc[test_idx]
+    ytr,yte=y.iloc[train_idx],y.iloc[test_idx]
+    groups_tr,groups_te=groups[train_idx],groups[test_idx]
+    assert set(groups_tr).isdisjoint(set(groups_te)), "A repeated feature vector crossed the train/test split."
     candidates={"svd":LinearDiscriminantAnalysis(solver="svd"),"lsqr_auto":LinearDiscriminantAnalysis(solver="lsqr",shrinkage="auto")}
-    cv=StratifiedKFold(n_splits=cfg["cv_folds"],shuffle=True,random_state=cfg["random_state"])
+    cv=StratifiedGroupKFold(n_splits=cfg["cv_folds"],shuffle=True,random_state=cfg["random_state"])
     comparison=[]
     for name,model in candidates.items():
         pipe=Pipeline([("preprocess",make_preprocessor(Xtr)),("lda",model)])
-        scores=cross_val_score(pipe,Xtr,ytr,cv=cv,scoring="f1",n_jobs=1)
+        scores=cross_val_score(pipe,Xtr,ytr,groups=groups_tr,cv=cv,scoring="f1",n_jobs=1)
         comparison.append({"configuration":name,"cv_f1_mean":float(scores.mean()),"cv_f1_std":float(scores.std())})
     selected=max(comparison,key=lambda x:x["cv_f1_mean"])["configuration"]
     pipe=Pipeline([("preprocess",make_preprocessor(Xtr)),("lda",candidates[selected])])
@@ -32,7 +40,9 @@ def main():
     results={"dataset":{"rows":len(df),"columns":len(df.columns),"predictors":len(X.columns),"test_samples":len(yte),"class_counts":{"phishing":int(y.sum()),"legitimate":int((1-y).sum())}},
       "metrics":{"accuracy":accuracy_score(yte,pred),"precision":precision_score(yte,pred),"recall":recall_score(yte,pred),"f1":f1_score(yte,pred),"specificity":tn/(tn+fp),"roc_auc":roc_auc_score(yte,proba),"pr_auc":average_precision_score(yte,proba),"confusion_matrix":{"tn":int(tn),"fp":int(fp),"fn":int(fn),"tp":int(tp)}},
       "timing":{"training_seconds":training_seconds,"test_inference_seconds":batch,"test_samples":len(yte),"mean_ms_per_sample":batch/len(yte)*1000,"throughput_samples_per_second":len(yte)/batch},
-      "selection":{"candidates":comparison,"selected":selected,"cv":"5-fold stratified training-only F1"},"environment":{"python":platform.python_version(),"scikit_learn":sklearn.__version__,"platform":platform.platform()},"positive_class":"phishing (-1 mapped to 1)"}
+      "selection":{"candidates":comparison,"selected":selected,"cv":"5-fold stratified grouped training-only F1"},
+      "split":{"method":"StratifiedGroupKFold","folds":cfg["cv_folds"],"random_state":cfg["random_state"],"group_key":"identical predictor vectors","train_samples":len(ytr),"test_samples":len(yte),"train_unique_groups":int(len(set(groups_tr))),"test_unique_groups":int(len(set(groups_te)))},
+      "environment":{"python":platform.python_version(),"scikit_learn":sklearn.__version__,"platform":platform.platform()},"positive_class":"phishing (-1 mapped to 1)"}
     for p in ["artifacts","outputs","app/static/plots","models"]: (ROOT/p).mkdir(parents=True,exist_ok=True)
     import joblib
     joblib.dump({"pipeline":pipe,"features":list(X.columns),"positive_label":-1},ROOT/"models/lda_pipeline.joblib")

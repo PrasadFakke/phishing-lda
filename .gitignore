@@ -7,5 +7,4 @@ outputs/*.json
 outputs/*.csv
 app/static/plots/*.png
 !app/static/plots/.gitkeep
-data/*.csv
 !data/README.md
